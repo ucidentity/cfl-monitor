@@ -35,9 +35,18 @@
 /plugins
 /web-app/plugins
 /web-app/WEB-INF/classes
+/out/
 
 # "temporary" build files
 /target
+/target-eclipse
 
 # other
 *.iws
+
+/plugin.xml
+/*.log
+/*DB.*
+/cobertura.ser
+.DS_Store
+/.link_to_grails_plugins/
