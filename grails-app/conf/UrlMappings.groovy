@@ -40,39 +40,32 @@ class UrlMappings {
 		/*
 		 * Inbound services
 		 */
-		"/v${version}/subjects/$id"(controller: "inbound") {
-			action = [GET: "subjects", POST: "subjectReset"]
+		"/v${version}/subjects/$id"(controller: "subject") {
+			action = [GET: "subjects", PUT: "subjectReset"]
 		}
 		
-		"/v${version}/thresholds/$id"(controller: "inbound") {
-			action = [GET: "thresholdList"]
-		}
-		
-		"/v${version}/threshold/actions/$timestamp"(controller: "inbound") {
+		"/v${version}/threshold/actions/$timestamp"(controller: "subject") {
 			action = [GET: "actionsSinceTimestamp"]
 		}
 		
-		"/v${version}/subjectThreshold/$id"(controller: "inbound") {
+		"/v${version}/subjectThreshold/$id"(controller: "subject") {
 			action = [GET: "subjectThresholdReport"]
 		}
 		
-		"/v${version}/reports/subjectCount/$count"(controller: "inbound") {
+		"/v${version}/reports/subjectCount/$count"(controller: "subject") {
 			action = [GET: "subjectCount"]
 		}
 		
-		"/v${version}/reports/actions/$timestamp"(controller: "inbound") {
+		"/v${version}/reports/actions/$timestamp"(controller: "subject") {
 			action = [GET: "actionsSinceTimestamp"]
 		}
 		
-		/*
-		 * Admin services
-		 */
-		"/v${version}/admin/thresholds"(controller: "actionThreshold") {
-			action = [POST: "newOrUpdateThreshold"]
+		"/v${version}/thresholds"(controller: "actionThreshold") {
+			action = [POST: "newThreshold", GET: "thresholdList"]
 		}
 		
-		"/v${version}/admin/thresholds/delete/$id"(controller: "actionThreshold") {
-			action = [PUT: "deleteThreshold"]
+		"/v${version}/thresholds/$id"(controller: "actionThreshold") {
+			action = [DELETE: "deleteThreshold", PUT: "updateThreshold", GET: "thresholdById"]
 		}
 		
         "/"(view:"/index")

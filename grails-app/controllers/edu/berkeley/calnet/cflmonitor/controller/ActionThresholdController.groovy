@@ -32,16 +32,36 @@ package edu.berkeley.calnet.cflmonitor.controller
 
 
 import org.apache.ivy.util.url.BasicURLHandler.HttpStatus;
-
+import grails.converters.JSON
 import edu.berkeley.calnet.cflmonitor.domain.ActionThreshold
 import grails.transaction.Transactional
 
 class ActionThresholdController {
 
-
+	def inboundService
+	
     def index() { }
     
-	/*
+	def thresholdList() {
+		def result = inboundService.thresholdList()
+		render( result as JSON)
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	def thresholdById(Integer id) {
+		def result = inboundService.thresholdById( id)
+		if( !result) {
+			response.status = 404
+			result = [:]
+		}
+		render( result as JSON)
+	}
+	
+	/**
 	 * Create or update an action threshold
 	 *  {
 	 *  	id: 1,
@@ -53,33 +73,49 @@ class ActionThresholdController {
 	 *  }
 	 */
 	@Transactional
-	def newOrUpdateThreshold() {
+	def newThreshold() {
 		def thresholdDetails = request.JSON
+		def newThreshold = new ActionThreshold()
 		
-		def threshId = thresholdDetails.id
-		if( threshId) {
-			
+		newThreshold.description = thresholdDetails.description
+		newThreshold.count = thresholdDetails.count
+		newThreshold.action = thresholdDetails.action
+		newThreshold.args = thresholdDetails.args 
+		newThreshold.enabled = thresholdDetails.enabled
+		
+		try {
+			newThreshold.save(flush:true)
 		}
-		else {  // build a new one
-			def newThreshold = new ActionThreshold()
-			newThreshold.description = thresholdDetails.description
-			newThreshold.count = thresholdDetails.count
-			newThreshold.action = thresholdDetails.action
-			newThreshold.args = thresholdDetails.args 
-			newThreshold.enabled = thresholdDetails.enabled
-			
-			try {
-				newThreshold.save(flush:true)
-			}
-			catch( Exception e) {
-				response.status = 400
-			}
+		catch( Exception e) {
+			response.status = 400
 		}
+		
 		render ""
 	}
 	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@Transactional
+	def updateThreshold( Integer id) {
+		
+	}
+	
+	/**
+	 * 
+	 * @param id threshold id to be deleted
+	 * @return
+	 */
+	@Transactional
 	def deleteThreshold( Integer id) {
 		def actionThreshold = ActionThreshold.findById( id)
+		if( actionThreshold)
+			actionThreshold.delete( flush:true)
+		else {
+			response.status = 400
+		}
 		
 		render ""
 	}

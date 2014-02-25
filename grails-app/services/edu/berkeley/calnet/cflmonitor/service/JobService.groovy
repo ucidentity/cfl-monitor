@@ -5,7 +5,6 @@ import edu.berkeley.calnet.cflmonitor.service.ActionService
 import edu.berkeley.calnet.cflmonitor.service.InboundService
 import edu.berkeley.calnet.cflmonitor.domain.ActionThreshold
 
-
 @Transactional
 class JobService {
 	def actionService
@@ -17,15 +16,15 @@ class JobService {
 		
 		// load thresholds
 		def thresholdList = ActionThreshold.findAll()
-		thresholdList.every { action ->
+		thresholdList.each { action ->
 			def service = actions[action.action]
 			if( service) {
 				// are there subjects with count exceeding the threshold?
 				def subjects = inboundService.subjectCount( action.count)
 				print subjects
-				subjects.subjects.every { subject ->
+				subjects.subjects.each { subject ->
 					print "Perform action: " + action.action + " subject: " + subject
-					service.performAction( service, action.args)
+					service.performAction( service, subject, action.args)
 				}
 			}
 			

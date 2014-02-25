@@ -28,56 +28,82 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.berkeley.calnet.cflmonitor.service
+package edu.berkeley.calnet.cflmonitor.controller
 
-import javax.mail.*
-import javax.mail.internet.*
-import java.util.Date;
-import java.sql.Timestamp;
-import edu.berkeley.calnet.cflmonitor.domain.History
-import edu.berkeley.calnet.cflmonitor.domain.ActionThreshold
+import grails.converters.JSON
+import java.sql.Timestamp
+import edu.berkeley.calnet.cflmonitor.domain.*
 
-class ActionService {
-	def actions = [:]
+class SubjectController {
 	
-	def grailsApplication
+	def inboundService
 	
-	/*
-	 * Load action config scripts
+    def index() { }
+    
+	/**
+	 * 
+	 * @param id
+	 * @return
 	 */
-	def refreshActions() {
-		actions.clear()
-		
-		new File( grailsApplication.config.cfl.externalFiles ).eachFile { file ->
-			def config = new ConfigSlurper().parse( file.toURL())
-			actions.put( config.key, config)
-		}
-	}
-	
-	def getActions() {
-		return actions;
+	def subjects(String id) {
+		def result = inboundService.getSubject( id) //[:]
+		render(result as JSON)
 	}
 	
 	/**
-	 * Callback method for scripted actions to create history records for the action that is executed.
 	 * 
-	 * @param subject
-	 * @param action
-	 * @param comment
+	 * @param id
 	 * @return
 	 */
-	static def createHistoryRecord( String subject, String action, String comment) {
-		def date = new Date()
-		def timestamp = new Timestamp( date.getTime())
+	def subjectReset(String id) {
+		def requestBody = request.JSON
+		def count = requestBody.count as Integer
+		if( count != 0) {
+			// return 400 Bad Request
+			response.status = 400
+		}
+		else {
+			try {
+				inboundService.subjectReset( id, count)
+				response.status = 200
+			}
+			catch( Exception e) {
+				e.printStackTrace()
+				response.status = 400
+			}
+		}
 		
-		def actionThreshold = ActionThreshold.findByAction( action)
-		
-		def history = new History()
-		history.subject = subject
-		history.action = actionThreshold
-		history.executed = timestamp
-		history.comment = comment
-		
-		history.save( flush:true)
+		render ""
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	def subjectThresholdReport(Integer id) {
+		def result = inboundService.subjectThresholdReport( id)
+		render( result as JSON)
+	}
+	
+	/**
+	 * Inbound REST call
+	 * 
+	 * @param count
+	 * @return subjects that have a failed count (minus resets) greater than count
+	 */
+	def subjectCount(Integer count) {
+		def result = inboundService.subjectCount( count)
+		render( result as JSON)
+	}
+	
+	/**
+	 * 
+	 * @param timestamp
+	 * @return
+	 */
+	def actionsSinceTimestamp(String timestamp) {
+		def result = inboundService.actionsSinceTimestamp( timestamp)
+		render( result as JSON)
 	}
 }

@@ -33,12 +33,17 @@ package edu.berkeley.calnet.cflmonitor.service
 import grails.transaction.Transactional
 
 import java.sql.Timestamp
-
+import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.format.DateTimeFormatter
 import edu.berkeley.calnet.cflmonitor.domain.*
 
 @Transactional
 class InboundService {
 
+	private String THRESHOLD_PATH = "/v&version/thresholds/&id"
+	
+	def grailsApplication
+	
 	/**
 	 * 
 	 * @param id
@@ -100,6 +105,106 @@ class InboundService {
 		result.count = count
 		result.subjects = subjects
 		
+		return result
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	def thresholdList() {
+		def result = [:]
+		def thresholdList = ActionThreshold.findAll()
+		print thresholdList
+		
+		def thresholds = [:]
+		thresholdList.each { threshold ->
+			String path = THRESHOLD_PATH.replaceFirst("&id", threshold.id.toString())
+			path = path.replaceFirst( "&version", grailsApplication.metadata.'app.version')
+			thresholds.put( threshold.id, path)
+		}
+		
+		result.thresholds = thresholds
+		
+		return result
+	}
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
+	def thresholdById( Integer id) {
+		def result = [:]
+		def threshold = ActionThreshold.findById( id)
+		if( threshold) {
+			def map = [:]
+			map.id = threshold.id
+			map.description = threshold.description
+			map.count = threshold.count
+			map.enabled = threshold.enabled
+			map.action = threshold.action	
+			
+			result.threshold = map
+		}
+		else { 
+			result = null
+		}
+		
+		return result
+	}
+	
+	/**
+	 * 
+	 * @param id threshold id
+	 * @return
+	 */
+	def subjectThresholdReport( Integer id) {
+		def result = [:]
+		def actionThreshold = ActionThreshold.findById( id)
+		if( actionThreshold) {
+			def subjects = subjectCount( actionThreshold.count)	
+			result.threshold = actionThreshold.count.toString()
+			
+			def subjectList = []
+			subjects.subjects.each { subject ->
+				subjectList.add( subject)
+			}
+			
+			result.subjects = subjectList
+		}
+		
+		return result
+	}
+	
+	/**
+	 * 
+	 * @param time Time in ISO8601 format
+	 * @return
+	 */
+	def actionsSinceTimestamp( String time) {
+		def result = [:]
+		
+		DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis()
+		
+		def dateTime = parser.parseDateTime( time)
+		print dateTime
+		def timestamp = new Timestamp( dateTime.getMillis())
+		def historyList = History.findAllByExecutedGreaterThan( timestamp)
+		print historyList
+		
+		def historyResult = []
+		historyList.each { history ->
+			def singleHistory = [:]
+			singleHistory.action = history.action.action
+			singleHistory.comment = history.comment
+			singleHistory.executed = history.executed.toString()
+			singleHistory.subject = history.subject
+			
+			historyResult.add( singleHistory)
+		}
+		
+		result.history = historyResult
 		return result
 	}
 }
