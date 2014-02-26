@@ -147,8 +147,15 @@ class InboundService {
 	def subjectCount(Integer count) {
 		def result = [:]
 		
-		def subjects = AuthFailureCounts.executeQuery( "select a.subject from AuthFailureCounts a where a.currentCount > :theCount",
-			[theCount: count])
+		//def subjects = AuthFailureCounts.executeQuery( "select a.subject from AuthFailureCounts a where a.currentCount > :theCount",
+		//	[theCount: count])
+		def subjects = AuthFailureCounts.createCriteria().list() {
+			projections {
+				property( 'subject')
+			}
+			
+			gt('currentCount', count)
+		}
 		
 		result.count = count
 		result.subjects = subjects
@@ -164,7 +171,6 @@ class InboundService {
 	def thresholdList() {
 		def result = [:]
 		def thresholdList = ActionThreshold.findAll()
-		print thresholdList
 		
 		def thresholds = [:]
 		thresholdList.each { threshold ->
@@ -174,7 +180,6 @@ class InboundService {
 		}
 		
 		result.thresholds = thresholds
-		
 		return result
 	}
 	

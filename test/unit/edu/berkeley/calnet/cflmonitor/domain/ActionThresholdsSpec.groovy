@@ -1,4 +1,4 @@
-package edu.berkeley.calnet.cflmonitor
+package edu.berkeley.calnet.cflmonitor.domain
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification

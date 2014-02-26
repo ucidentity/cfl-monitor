@@ -1,4 +1,4 @@
-package edu.berkeley.calnet.cflmonitor
+package edu.berkeley.calnet.cflmonitor.domain
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -6,8 +6,8 @@ import spock.lang.Specification
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
-@TestFor(AuthFailure)
-class FailedAuthSpec extends Specification {
+@TestFor(AuthReset)
+class ResetEventSpec extends Specification {
 
     def setup() {
     }
