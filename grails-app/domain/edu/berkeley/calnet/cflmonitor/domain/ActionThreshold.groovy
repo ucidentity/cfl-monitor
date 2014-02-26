@@ -49,4 +49,13 @@ class ActionThreshold {
         action(size:1..80)
 		description(size:1..80)
     }
+	
+	def asReportMap() {
+		def result = [:]
+		result.id = id
+		result.description = description
+		result.count = count
+		result.action = action
+		result
+	}
 }

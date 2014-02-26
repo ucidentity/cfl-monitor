@@ -45,14 +45,14 @@ class SubjectController {
 	 * @param id
 	 * @return
 	 */
-	def subjects(String id) {
-		def result = inboundService.getSubject( id) //[:]
+	def subjectDetails(String id) {
+		def result = inboundService.getSubjectDetails( id) //[:]
 		render(result as JSON)
 	}
 	
 	/**
 	 * 
-	 * @param id
+	 * @param id Subject id to reset
 	 * @return
 	 */
 	def subjectReset(String id) {
@@ -87,7 +87,6 @@ class SubjectController {
 	}
 	
 	/**
-	 * Inbound REST call
 	 * 
 	 * @param count
 	 * @return subjects that have a failed count (minus resets) greater than count

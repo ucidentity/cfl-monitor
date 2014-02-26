@@ -43,19 +43,23 @@ class InboundService {
 	private String THRESHOLD_PATH = "/v&version/thresholds/&id"
 	
 	def grailsApplication
+	def actionService
 	
 	/**
 	 * 
 	 * @param id
 	 * @return
 	 */
-    def getSubject( String id) {
+    def getSubjectDetails( String id) {
 		def result = [:]
 		def numFailures = AuthFailure.countBySubject(id)
 		def lastReset = AuthReset.createCriteria().list {
 			eq('subject', id)
 			order('reset', 'desc')
 		}
+		
+		result.subject = id
+		result.count = numFailures
 		
 		if( lastReset) {
 			result.lastReset = lastReset[0].reset
@@ -69,24 +73,68 @@ class InboundService {
 			}
 		}
 		
-		result.subject = id
-		result.count = numFailures
+		// get exceeded thresholds
+		def actionThresholds = ActionThreshold.createCriteria().list {
+			lt('count', numFailures.toInteger())
+			eq('enabled', 1)
+		}
+		
+		if( actionThresholds) {
+			def exceededThresholds = []
+			actionThresholds.each { threshold ->
+				exceededThresholds << threshold.asReportMap()
+			}
+			
+			result.exceededThresholds = exceededThresholds
+		}
+		
+		// get history records
+		def historyList = History.createCriteria().list {
+			eq('subject', id)	
+		}
+		
+		def historyRecords = []
+		
+		historyList.each { history ->
+			def historyRecord = [:]
+			historyRecord.id = history.id
+			historyRecord.comment = history.comment
+			historyRecord.executed = history.executed
+			
+			if( history.action) {
+				def actionDetails = [:]
+				def actionThreshold = history.action
+				
+				actionDetails.id = actionThreshold.id
+				actionDetails.description = actionThreshold.description
+				actionDetails.count = actionThreshold.count
+				actionDetails.action = actionThreshold.action
+				
+				historyRecord.action = actionDetails
+			}
+			
+			historyRecords << historyRecord
+		}
+		
+		result.historyRecords = historyRecords
 		
 		return result
     }
 	
 	/**
+	 * Reset the failed auth count for the specified subject
 	 * 
-	 * @param id
+	 * @param id Subject to reset
 	 * @param count
 	 * @return
 	 */
 	def subjectReset(String id, Integer count) {
-		// does subject exist???? zzmatt
-		
 		def reset = new AuthReset()
 		reset.subject = id
 		reset.reset = new Timestamp( System.currentTimeMillis())
+		
+		// create a history record for the reset
+		ActionService.createHistoryRecord( id, "Reset", "Failed count reset recorded for " + id)
 		
 		reset.save(flush:true)
 	}
@@ -109,6 +157,7 @@ class InboundService {
 	}
 	
 	/**
+	 * Return all action thresholds
 	 * 
 	 * @return
 	 */
@@ -130,6 +179,7 @@ class InboundService {
 	}
 	
 	/**
+	 * Return action threshold details
 	 * 
 	 * @param id
 	 * @return
@@ -138,12 +188,8 @@ class InboundService {
 		def result = [:]
 		def threshold = ActionThreshold.findById( id)
 		if( threshold) {
-			def map = [:]
-			map.id = threshold.id
-			map.description = threshold.description
-			map.count = threshold.count
+			def map = threshold.asReportMap()
 			map.enabled = threshold.enabled
-			map.action = threshold.action	
 			
 			result.threshold = map
 		}
@@ -168,7 +214,7 @@ class InboundService {
 			
 			def subjectList = []
 			subjects.subjects.each { subject ->
-				subjectList.add( subject)
+				subjectList << subject
 			}
 			
 			result.subjects = subjectList
@@ -195,13 +241,8 @@ class InboundService {
 		
 		def historyResult = []
 		historyList.each { history ->
-			def singleHistory = [:]
-			singleHistory.action = history.action.action
-			singleHistory.comment = history.comment
-			singleHistory.executed = history.executed.toString()
-			singleHistory.subject = history.subject
-			
-			historyResult.add( singleHistory)
+			def singleHistory = history.asReportMap()
+			historyResult << singleHistory
 		}
 		
 		result.history = historyResult

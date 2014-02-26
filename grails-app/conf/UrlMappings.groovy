@@ -41,7 +41,7 @@ class UrlMappings {
 		 * Inbound services
 		 */
 		"/v${version}/subjects/$id"(controller: "subject") {
-			action = [GET: "subjects", PUT: "subjectReset"]
+			action = [GET: "subjectDetails", PUT: "subjectReset"]
 		}
 		
 		"/v${version}/threshold/actions/$timestamp"(controller: "subject") {

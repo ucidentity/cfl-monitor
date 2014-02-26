@@ -47,5 +47,17 @@ class History {
     static constraints = {
         subject(size:1..80)
         comment(size:1..255)
+		action(nullable:true)
     }
+	
+	def asReportMap() {
+		def singleHistory = [:]
+		if( action) {
+			singleHistory.action = action.action
+		}
+		singleHistory.comment = comment
+		singleHistory.executed = executed.toString()
+		singleHistory.subject = subject
+		singleHistory
+	}
 }
