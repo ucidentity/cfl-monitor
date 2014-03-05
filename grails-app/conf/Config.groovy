@@ -220,6 +220,6 @@ grails.json.date = "javascript"
 
 // this is the default action polling time
 cfl {
-	externalFiles = "/Users/mglazier/work/unicon/berkley/actions"
+	externalFiles = "/var/cfl/actions"
 	cron = "0 0/2 * * * ?"
 }
