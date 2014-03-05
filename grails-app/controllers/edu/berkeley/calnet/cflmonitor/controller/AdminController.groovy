@@ -28,20 +28,23 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.berkeley.calnet.cflmonitor
+package edu.berkeley.calnet.cflmonitor.controller
 
-import org.quartz.JobExecutionContext; 
-import org.quartz.JobExecutionException; 
+import edu.berkeley.calnet.cflmonitor.domain.*
 
-class ActionJob {
+class AdminController {
+
+	def inboundService
 	
-	def jobService
-	
-	// trigger is empty because it will be dynamically scheduled
-    static triggers = {
-    }
-
-    def execute( JobExecutionContext context) throws JobExecutionException { 
-		jobService.execute()
-    }
+	/**
+	 * 
+	 * @return
+	 */
+    def updateConfig() {
+		def requestBody = request.JSON
+		
+		inboundService.updateConfiguration( requestBody)
+		
+		render ""
+	}
 }

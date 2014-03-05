@@ -13,7 +13,13 @@ hibernate {
 
 // environment specific settings
 environments {
-    development {
+	development {
+		dataSource {
+			dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+			url = "jdbc:h2:file:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
+		}
+	}
+    development-mysql {
         dataSource {
              driverClassName = "com.mysql.jdbc.Driver"
             dialect = org.hibernate.dialect.MySQLDialect

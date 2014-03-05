@@ -68,6 +68,13 @@ class UrlMappings {
 			action = [DELETE: "deleteThreshold", PUT: "updateThreshold", GET: "thresholdById"]
 		}
 		
+		/*
+		 * Admin
+		 */
+		"/v${version}/admin/config"(controller: "admin") {
+			action = [POST: "updateConfig"]
+		}
+		
         "/"(view:"/index")
         "500"(view:'/error')
 	}

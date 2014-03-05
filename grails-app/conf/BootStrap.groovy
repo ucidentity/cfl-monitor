@@ -1,4 +1,5 @@
 import edu.berkeley.calnet.cflmonitor.domain.*
+import edu.berkeley.calnet.cflmonitor.service.*
 import edu.berkeley.calnet.cflmonitor.ActionJob
 
 import static org.quartz.TriggerBuilder.*
@@ -37,12 +38,16 @@ class BootStrap {
         }
 		
 		def cronString = grailsApplication.config.cfl.cron as String
+		def configList = Configuration.findAll() // should only be one
+		if( configList.size() > 0) {
+			cronString = configList[0].cron
+		}
 		
 		// start action trigger
 		def trigger = newTrigger()
-			.withIdentity( "actionTrigger", null)
+			.withIdentity( ActionService.JOB_IDENTITY, ActionService.JOB_GROUP)
 			.withSchedule( cronSchedule( cronString))
-			.forJob( "actionJob")
+			.forJob( ActionService.JOB_NAME)
 			.build()
 		
 		ActionJob.schedule( trigger)

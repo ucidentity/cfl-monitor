@@ -117,6 +117,9 @@ environments {
     development {
         grails.logging.jul.usebridge = true
     }
+	development-mysql {
+		grails.logging.jul.usebridge = true
+	}
     production {
         grails.logging.jul.usebridge = false
         // TODO: grails.serverURL = "http://www.changeme.com"
@@ -124,26 +127,27 @@ environments {
 }
 
 // log4j configuration
+def catalinaBase = System.properties.getProperty('catalina.base')
+if (!catalinaBase) catalinaBase = '/Users/mglazier/work'
+def logDirectory = "${catalinaBase}/logs/cfl"
+
 log4j = {
     // Example of changing the log pattern for the default console appender:
     //
     appenders {
-        console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+        console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
+		appender new DailyRollingFileAppender(
+			name: "rollingFileCfl",
+			file: "${logDirectory}/cfl.log",
+			datePattern: "'.'yyyy-MM-dd",
+			layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
+		)
     }
     
-    error  'org.codehaus.groovy.grails.web.servlet',        // controllers
-           'org.codehaus.groovy.grails.web.pages',          // GSP
-           'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-           'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-           'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-           'org.codehaus.groovy.grails.commons',            // core / classloading
-           'org.codehaus.groovy.grails.plugins',            // plugins
-           'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-           'net.sf.ehcache.hibernate'
-    
-    info  'org.springframework'
-	
-    error 'org.hibernate'
+	root {
+		info 'stdout', 'rollingFileCfl'
+		additivity = false
+	}
 	
 	debug 'org.quartz'
 }
@@ -153,6 +157,7 @@ grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'edu.berkeley.
 grails.plugins.springsecurity.authority.className = 'edu.berkeley.calnet.cflmonitor.domain.SecRole'
 
 import grails.plugins.springsecurity.SecurityConfigType
+import org.apache.log4j.DailyRollingFileAppender
 import org.springframework.core.io.DefaultResourceLoader
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
@@ -183,6 +188,9 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	],
 	'/html/**':							[
 		'IS_AUTHENTICATED_ANONYMOUSLY'
+	],
+	'/dbconsole/**':							[
+		'ROLE_ADMIN'
 	]
 ]
 
@@ -210,6 +218,7 @@ grails.plugins.springsecurity.basic.realmName = "CFL Server"
 grails.converters.pretty.print = true
 grails.json.date = "javascript"
 
+// this is the default action polling time
 cfl {
 	externalFiles = "/Users/mglazier/work/unicon/berkley/actions"
 	cron = "0 0/2 * * * ?"

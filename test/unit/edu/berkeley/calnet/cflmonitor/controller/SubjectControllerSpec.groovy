@@ -16,7 +16,9 @@ class SubjectControllerSpec extends Specification {
     def setup() {
 		new ActionThreshold(id:1, enabled: 1, action: "anAction", description: "desc", count: 2, args: "some args")
 			.save()
-		
+		new ActionThreshold(id:2, enabled: 1, action: "anotherAction", description: "desc", count: 4, args: "more args")
+			.save()
+			
 		new AuthFailure(id:1, ipAddress: "192.168.0.1", service: "test service", subject: "test", recorded: "2014-02-26 14:35:40")
 			.save()
 		new AuthFailure(id:2, ipAddress: "192.168.0.1", service: "test service", subject: "test", recorded: "2014-02-26 14:35:41")
@@ -35,7 +37,7 @@ class SubjectControllerSpec extends Specification {
     def cleanup() {
     }
 
-    void "test valid Subject details"() {
+    void "Test valid Subject details"() {
 		when:
 			controller.subjectDetails( "test")
 				
@@ -45,7 +47,7 @@ class SubjectControllerSpec extends Specification {
 			response.json.exceededThresholds[0].count == 2
     }
 	
-	def "Test subject count"() {
+	def "Test Subject count"() {
 		when:
 			controller.subjectCount( 2)
 			
@@ -72,5 +74,13 @@ class SubjectControllerSpec extends Specification {
 			
 		then:
 			response.status == 200
+	}
+	
+	def "Test Subject Threshold Report"() {
+		when:
+			controller.subjectThresholdReport(1)
+			
+		then:
+			controller.response.json.subjects[0] == "test"
 	}
 }

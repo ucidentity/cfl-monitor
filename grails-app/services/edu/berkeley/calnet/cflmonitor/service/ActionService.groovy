@@ -31,16 +31,33 @@
 package edu.berkeley.calnet.cflmonitor.service
 
 import javax.mail.*
+
 import javax.mail.internet.*
+
 import java.util.Date;
 import java.sql.Timestamp;
+
+import org.quartz.Scheduler
+import org.quartz.Trigger
+import org.quartz.TriggerKey
+import org.quartz.impl.StdSchedulerFactory
+import static org.quartz.TriggerBuilder.*
+import static org.quartz.CronScheduleBuilder.*
+
 import edu.berkeley.calnet.cflmonitor.domain.History
 import edu.berkeley.calnet.cflmonitor.domain.ActionThreshold
+import edu.berkeley.calnet.cflmonitor.domain.Configuration
+import edu.berkeley.calnet.cflmonitor.ActionJob
 
 class ActionService {
 	def actions = [:]
 	
 	def grailsApplication
+	def quartzScheduler
+	
+	static String JOB_IDENTITY = "actionTrigger"
+	static String JOB_GROUP = "actionGroup"
+	static String JOB_NAME = "actionJob"
 	
 	/*
 	 * Load action config scripts
@@ -56,6 +73,22 @@ class ActionService {
 	
 	def getActions() {
 		return actions;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	def rescheduleJob() {
+	   //quartzScheduler.unscheduleJob( JOB_IDENTITY, null)
+	   
+	   def config = Configuration.findAll()
+	   if( config.size() > 0) {
+		   def triggerKey = TriggerKey.triggerKey( JOB_IDENTITY, JOB_GROUP)
+		   Trigger trigger = quartzScheduler.getTrigger( triggerKey)
+		   trigger.setCronExpression( config[0].cron)
+		   quartzScheduler.rescheduleJob( triggerKey, trigger)
+	   }
 	}
 	
 	/**

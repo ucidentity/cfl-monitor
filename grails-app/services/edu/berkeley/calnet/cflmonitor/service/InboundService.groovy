@@ -30,9 +30,11 @@
 
 package edu.berkeley.calnet.cflmonitor.service
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 import java.sql.Timestamp
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import edu.berkeley.calnet.cflmonitor.domain.*
@@ -142,13 +144,11 @@ class InboundService {
 	/**
 	 * 
 	 * @param count
-	 * @return subjects that have a failed count (minus resets) greater than count
+	 * @return
 	 */
 	def subjectCount(Integer count) {
 		def result = [:]
 		
-		//def subjects = AuthFailureCounts.executeQuery( "select a.subject from AuthFailureCounts a where a.currentCount > :theCount",
-		//	[theCount: count])
 		def subjects = AuthFailureCounts.createCriteria().list() {
 			projections {
 				property( 'subject')
@@ -159,6 +159,65 @@ class InboundService {
 		
 		result.count = count
 		result.subjects = subjects
+		
+		return result
+	}
+	
+	/**
+	 * 
+	 * @param count
+	 * @param actionId id of the action to retrieve a count
+	 * 
+	 * @return subjects that have a failed count (minus resets) greater than count
+	 */
+	def subjectCountByAction(Integer count, Long actionId) {
+		def result = [:]
+		
+		def subjects = AuthFailureCounts.createCriteria().list() {
+			projections {
+				property( 'subject')
+			}
+			
+			gt('currentCount', count)
+		}
+		
+		Timestamp now = new Timestamp( new Date().getTime())
+		def returnSubjectList = []
+		if( subjects.size() > 0) {
+			returnSubjectList = subjects.findAll { subject ->
+				// get the history
+				def historyList = History.createCriteria().list {
+					eq('subject', subject)
+					order('executed', 'desc')
+				}
+				
+				boolean processAction = true
+				boolean foundReset = false
+				boolean foundMatch = historyList.any { history ->
+					// look for this action in the list that appears before a reset event
+					if( history.action == null) {
+						// reset actions have null action
+						foundReset = true
+					}
+					else if( history.action.id == actionId) {
+						processAction = false
+					}
+					
+					if( foundReset || !processAction) {
+						return true
+					}
+				}
+				
+				if( foundReset || processAction) {
+					return true
+				}
+				
+				return false
+			}
+		}
+		
+		result.count = count
+		result.subjects = returnSubjectList
 		
 		return result
 	}
@@ -252,5 +311,27 @@ class InboundService {
 		
 		result.history = historyResult
 		return result
+	}
+	
+	/**
+	 * 
+	 * @param body
+	 * @return
+	 */
+	def updateConfiguration( JSONObject body) {
+		def configList = Configuration.findAll() // should only be one
+		def config = null
+		
+		if( configList.size() == 0) {
+			config = new Configuration()
+		}
+		else {
+			config = configList[0]
+		}
+		
+		config.cron = body.cron
+		config.save( flush:true)
+		
+		actionService.rescheduleJob()
 	}
 }
