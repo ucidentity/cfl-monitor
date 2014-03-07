@@ -56,7 +56,7 @@ enabled: 1
 
 The same data can also be added via SQL into the `action_thresholds` table if desired.
 
-**Action Scripts**
+##Action Scripts
 
 The threshold action scripts are essentially Groovy configuration files that are read by the application at runtime.  There are two important pieces of configuration that the script needs to have in order to be executed.
 
@@ -81,7 +81,7 @@ The `performAction` property is a Groovy closure that the application will execu
 
 `args`: a String reference to the value of the args column for the action in the `action_thresholds` table.
 
-**Default Polling Interval**
+##Default Polling Interval
 
 The polling interval is set as a cron string and is located along with the action script directory in Config.groovy.  The default polling interval is set to:
 `cron = "0 0/2 * * * ?"` which will poll every two minutes.
@@ -97,7 +97,7 @@ The best way to change the polling interval is to use the application's REST int
 
 After sending this command, the polling interval will be stored in the database and the default from the Config.groovy will not be used.
 
-**Populating Test Failure Data**
+##Populating Test Failure Data
 
 In order for the actions to execute, there must be data in the `authentication_failures` table.
 
