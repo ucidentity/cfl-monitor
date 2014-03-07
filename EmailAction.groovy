@@ -6,7 +6,7 @@ import edu.berkeley.calnet.cflmonitor.domain.History
 import edu.berkeley.calnet.cflmonitor.service.ActionService
 
 name = "Email Action"
-key = "emailAction"
+action = "emailAction"
 
 performAction = { config, subject, args ->
 	def props = new Properties()
@@ -27,7 +27,7 @@ performAction = { config, subject, args ->
 		transport.connect( jsonArgs.host, jsonArgs.username, jsonArgs.password)
 		transport.sendMessage( msg, msg.getAllRecipients())
 
-		ActionService.createHistoryRecord( subject, config.key, "Email sent")
+		ActionService.createHistoryRecord( subject, config.action, "Email sent")
 	}
 	catch( Exception e) {
 	   println "Error in mail"

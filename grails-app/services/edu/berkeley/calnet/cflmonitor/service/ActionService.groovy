@@ -67,7 +67,7 @@ class ActionService {
 		
 		new File( grailsApplication.config.cfl.externalFiles ).eachFile { file ->
 			def config = new ConfigSlurper().parse( file.toURL())
-			actions.put( config.key, config)
+			actions.put( config.action, config)
 		}
 	}
 	
