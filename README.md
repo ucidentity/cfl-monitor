@@ -68,7 +68,8 @@ import edu.berkeley.calnet.cflmonitor.service.ActionService
 action = "actionKey"
 performAction = { config, subject, args ->
 	ActionService.createHistoryRecord( subject, config.action, "Action executed")
-	JSONObject jsonArgs = JSON.parse( args)}
+	JSONObject jsonArgs = JSON.parse( args)
+}
 </pre>
 
 The `action` property in the script must match the `action` property in the `action_thresholds` table.  See the example JSON body in the previous section.
@@ -88,14 +89,14 @@ The polling interval is set as a cron string and is located along with the actio
 
 During each polling cycle, the application will read all scripts in the action scripts directory and gather all subjects that exceed the thresholds of each configured action.
 
-The best way to change the polling interval is to use the application's REST interface.  The endpoint to change the polling interval is [http://localhost:8080/cfl/v1/admin/config](http://localhost:8080/cfl/v1/admin/config).  Send an HTTP POST with the following JSON body:
+The best way to change the polling interval is to use the application's REST interface.  The endpoint to change the polling interval is [http://localhost:8080/cfl/v1/admin/config](http://localhost:8080/cfl/v1/admin/config).  Send an HTTP POST with a cron string in the JSON body:
 <pre>
 {
 	cron: '0 30 * * * ?'
 }
 </pre>
 
-After sending this command, the polling interval will be stored in the database and the default from the Config.groovy will not be used.
+After sending this command, the polling interval will be stored in the database and the default from the Config.groovy file will no longer be used.
 
 ##Populating Test Failure Data
 
