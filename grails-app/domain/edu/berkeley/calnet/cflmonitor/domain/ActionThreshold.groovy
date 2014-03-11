@@ -43,6 +43,7 @@ class ActionThreshold {
     
     static mapping = {
         table 'action_thresholds'
+		version false
     }
     
     static constraints = {

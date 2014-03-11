@@ -6,6 +6,7 @@ class Configuration {
 	
 	static mapping = {
 		table 'cfl_configuration'
+		version false
 	}
 	
     static constraints = {

@@ -42,6 +42,7 @@ class History {
     static mapping = {
         table 'history_records'
         action column: 'action'
+		version false
     }
     
     static constraints = {

@@ -39,6 +39,7 @@ class AuthReset {
     static mapping = {
         table 'authentication_resets'
 		reset(type: Timestamp, sqlType:'timestamp')
+		version false
     }
     
     static constraints = {

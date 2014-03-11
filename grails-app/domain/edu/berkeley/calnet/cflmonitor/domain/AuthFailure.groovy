@@ -41,6 +41,7 @@ class AuthFailure {
     static mapping = {
         table 'authentication_failures'
         ipAddress column: 'ip_address'
+		version false
     }
     
     static constraints = {

@@ -47,6 +47,7 @@ class LastAction {
     static mapping = {
         table 'last_actions'
         actionThreshold column: 'action_threshold'
+		version false
     }
     
     static constraints = {
