@@ -55,6 +55,17 @@ class InboundService {
     def getSubjectDetails( String id) {
 		def result = [:]
 		def numFailures = AuthFailure.countBySubject(id)
+		
+		if( numFailures == 0) {
+			result.status = 404
+			return result
+		}
+		
+		AuthFailureCounts authFailureCount = AuthFailureCounts.findBySubject( id)
+		if( authFailureCount) {
+			numFailures = authFailureCount.currentCount
+		}
+		
 		def lastReset = AuthReset.createCriteria().list {
 			eq('subject', id)
 			order('reset', 'desc')
@@ -62,18 +73,6 @@ class InboundService {
 		
 		result.subject = id
 		result.count = numFailures
-		
-		if( lastReset) {
-			result.lastReset = lastReset[0].reset
-			
-			numFailures = AuthFailure.createCriteria().get {
-				projections {
-					count('id')
-				}
-				ge('recorded', lastReset[0].reset)
-				eq('subject', id)
-			}
-		}
 		
 		// get exceeded thresholds
 		def actionThresholds = ActionThreshold.createCriteria().list {

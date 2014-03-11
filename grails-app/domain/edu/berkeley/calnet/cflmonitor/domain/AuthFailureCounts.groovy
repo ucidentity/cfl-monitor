@@ -36,6 +36,8 @@ class AuthFailureCounts {
     static mapping = {
         table 'authentication_failure_counts'
         currentCount column: 'current_count'
+		version false
+		id generator: 'assigned', name: 'subject', type:'String'
     }
     
     static constraints = {

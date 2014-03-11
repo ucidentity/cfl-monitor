@@ -10,6 +10,10 @@ class JobService {
 	def actionService
 	def inboundService
 	
+	/**
+	 * 
+	 * @return
+	 */
     def execute() {
 		actionService.refreshActions()
 		def actions = actionService.getActions()
@@ -17,16 +21,17 @@ class JobService {
 		// load thresholds
 		def thresholdList = ActionThreshold.findAll()
 		thresholdList.each { action ->
-			def service = actions[action.action]
-			if( service) {
-				// are there subjects with count exceeding the threshold?
-				def subjects = inboundService.subjectCountByAction( action.count, action.id)
-				subjects.subjects.each { subject ->
-					print "Perform action: " + action.action + " subject: " + subject
-					service.performAction( service, subject, action.args)
+			if( action.enabled == 1) {
+				def service = actions[action.action]
+				if( service) {
+					// are there subjects with count exceeding the threshold?
+					def subjects = inboundService.subjectCountByAction( action.count, action.id)
+					subjects.subjects.each { subject ->
+						log.info "Perform action: " + action.action + " subject: " + subject
+						service.performAction( service, subject, action.args)
+					}
 				}
 			}
-			
 		}
     }
 }

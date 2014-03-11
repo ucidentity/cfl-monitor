@@ -47,6 +47,9 @@ class SubjectController {
 	 */
 	def subjectDetails(String id) {
 		def result = inboundService.getSubjectDetails( id) //[:]
+		if( result.status == 404) {
+			response.status = 404
+		}
 		render(result as JSON)
 	}
 	

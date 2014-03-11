@@ -80,8 +80,6 @@ class ActionService {
 	 * @return
 	 */
 	def rescheduleJob() {
-	   //quartzScheduler.unscheduleJob( JOB_IDENTITY, null)
-	   
 	   def config = Configuration.findAll()
 	   if( config.size() > 0) {
 		   def triggerKey = TriggerKey.triggerKey( JOB_IDENTITY, JOB_GROUP)
