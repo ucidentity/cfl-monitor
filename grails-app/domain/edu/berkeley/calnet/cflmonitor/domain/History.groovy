@@ -33,7 +33,6 @@ package edu.berkeley.calnet.cflmonitor.domain
 import java.sql.Timestamp
 
 class History {
-    Integer     id
     String      subject
     String      comment
     Timestamp   executed

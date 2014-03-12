@@ -38,8 +38,6 @@ Most recent action, per subject+action (used by Monitor to determine if a thresh
 
 */
 class LastAction {
-
-    Integer     id
     String      subject
     Timestamp   executed
     ActionThreshold actionThreshold

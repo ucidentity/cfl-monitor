@@ -56,6 +56,17 @@ enabled: 1
 
 The same data can also be added via SQL into the `action_thresholds` table if desired.
 
+###Populating Test Failure Data
+
+In order for the sample action to execute, there must be data in the `authentication_failures` table.
+
+The following SQL will populate a row in the failures table:
+<pre>
+insert into authentication_failures (ip_address,recorded,service,subject) values ('192.168.0.1',now(),'test service', 'test');
+</pre>
+
+Several rows will need to be added depending on the threshold count for the configured actions.
+
 ##Action Scripts
 
 The threshold action scripts are essentially Groovy configuration files that are read by the application at runtime.  There are two important pieces of configuration that the script needs to have in order to be executed.
@@ -98,13 +109,3 @@ The best way to change the polling interval is to use the application's REST int
 
 After sending this command, the polling interval will be stored in the database and the default from the Config.groovy file will no longer be used.
 
-##Populating Test Failure Data
-
-In order for the actions to execute, there must be data in the `authentication_failures` table.
-
-The following SQL will populate a row in the failures table:
-<pre>
-insert into authentication_failures (version,ip_address,recorded,service,subject) values (1,'192.168.0.1',now(),'test service', 'test');
-</pre>
-
-Several rows will need to be added depending on the threshold count for the configured actions.

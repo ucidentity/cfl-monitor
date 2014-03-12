@@ -25,7 +25,7 @@ class JobService {
 				def service = actions[action.action]
 				if( service) {
 					// are there subjects with count exceeding the threshold?
-					def subjects = inboundService.subjectCountByAction( action.count, action.id)
+					def subjects = inboundService.subjectCountByAction( (Long)action.count, action.id)
 					subjects.subjects.each { subject ->
 						log.info "Perform action: " + action.action + " subject: " + subject
 						service.performAction( service, subject, action.args)

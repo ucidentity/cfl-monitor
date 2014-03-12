@@ -32,7 +32,6 @@ package edu.berkeley.calnet.cflmonitor.domain
 import java.sql.Timestamp
 
 class AuthFailure {
-    Long        id
     String      subject
     String      service
     String      ipAddress

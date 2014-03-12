@@ -31,7 +31,7 @@ package edu.berkeley.calnet.cflmonitor.domain
 
 class AuthFailureCounts {
     String  subject
-    Integer currentCount
+    Long currentCount
     
     static mapping = {
         table 'authentication_failure_counts'

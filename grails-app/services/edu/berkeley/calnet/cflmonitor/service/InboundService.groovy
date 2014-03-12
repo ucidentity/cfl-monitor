@@ -169,7 +169,7 @@ class InboundService {
 	 * 
 	 * @return subjects that have a failed count (minus resets) greater than count
 	 */
-	def subjectCountByAction(Integer count, Long actionId) {
+	def subjectCountByAction(Long count, Long actionId) {
 		def result = [:]
 		
 		def subjects = AuthFailureCounts.createCriteria().list() {

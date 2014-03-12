@@ -43,5 +43,6 @@ class AuthReset {
     }
     
     static constraints = {
+		subject(size:1..80)
     }
 }
