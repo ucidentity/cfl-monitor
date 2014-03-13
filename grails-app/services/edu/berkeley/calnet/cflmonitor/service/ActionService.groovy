@@ -76,6 +76,8 @@ class ActionService {
 	}
 	
 	/**
+	 * Schedule the quartz job based upon the current value of
+	 * the cron string in the database.
 	 * 
 	 * @return
 	 */

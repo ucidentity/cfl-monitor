@@ -48,7 +48,7 @@ class UrlMappings {
 			action = [GET: "actionsSinceTimestamp"]
 		}
 		
-		"/v${version}/subjectThreshold/$id"(controller: "subject") {
+		"/v${version}/reports/subjectThreshold/$id"(controller: "subject") {
 			action = [GET: "subjectThresholdReport"]
 		}
 		

@@ -72,24 +72,11 @@ class ActionThresholdController {
 	 *  	enabled: true/false
 	 *  }
 	 */
-	@Transactional
 	def newThreshold() {
 		def thresholdDetails = request.JSON
-		def newThreshold = new ActionThreshold()
-		
-		newThreshold.description = thresholdDetails.description
-		newThreshold.count = thresholdDetails.count
-		newThreshold.action = thresholdDetails.action
-		newThreshold.args = thresholdDetails.args 
-		newThreshold.enabled = thresholdDetails.enabled
-		
-		try {
-			newThreshold.save(flush:true)
-		}
-		catch( Exception e) {
+		boolean ret = inboundService.createThreshold( thresholdDetails)
+		if( !ret)
 			response.status = 400
-		}
-		
 		render ""
 	}
 	
@@ -100,7 +87,11 @@ class ActionThresholdController {
 	 */
 	@Transactional
 	def updateThreshold( Integer id) {
-		
+		def thresholdDetails = request.JSON
+		boolean ret = inboundService.updateThreshold( id, thresholdDetails)
+		if( !ret)
+			response.status = 400
+		render ""
 	}
 	
 	/**
@@ -108,12 +99,9 @@ class ActionThresholdController {
 	 * @param id threshold id to be deleted
 	 * @return
 	 */
-	@Transactional
 	def deleteThreshold( Integer id) {
-		def actionThreshold = ActionThreshold.findById( id)
-		if( actionThreshold)
-			actionThreshold.delete( flush:true)
-		else {
+		boolean ret = inboundService.deleteThreshold( id)
+		if( !ret){
 			response.status = 400
 		}
 		

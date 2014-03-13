@@ -163,6 +163,10 @@ class InboundService {
 	}
 	
 	/**
+	 * Return subjects whose current failure counts exceed action threshold identified by actionId.
+	 * Only subjects that meet the execution criteria are returned.  For example, if a subject has a threshold count without resets
+	 * that exceed an action count and the history for the subject shows that an action has been executed, the subject
+	 * will not be included in the results.
 	 * 
 	 * @param count
 	 * @param actionId id of the action to retrieve a count
@@ -264,6 +268,7 @@ class InboundService {
 	}
 	
 	/**
+	 * Return subjects who have a failure count that exceeds the action threashold count.
 	 * 
 	 * @param id threshold id
 	 * @return
@@ -287,6 +292,87 @@ class InboundService {
 	}
 	
 	/**
+	 * Create a new action threshold from JSON formatted data.
+	 * 
+	 * @param thresholdDetails
+	 * @return success
+	 */
+	def createThreshold( JSONObject thresholdDetails) {
+		boolean success = true
+		
+		def newThreshold = new ActionThreshold()
+		
+		newThreshold.description = thresholdDetails.description
+		newThreshold.count = thresholdDetails.count
+		newThreshold.action = thresholdDetails.action
+		newThreshold.args = thresholdDetails.args
+		newThreshold.enabled = thresholdDetails.enabled
+		
+		try {
+			newThreshold.save(flush:true)
+		}
+		catch( Exception e) {
+			success = false
+		}
+		
+		return success
+	}
+	
+	/**
+	 * Update action threshold settings.
+	 * 
+	 * @param id
+	 * @param thresholdDetails
+	 * @return
+	 */
+	def updateThreshold( Integer id, JSONObject thresholdDetails) {
+		boolean success = true
+		ActionThreshold actionThreshold = ActionThreshold.findById( id)
+		
+		if( thresholdDetails.count) {
+			actionThreshold.count = thresholdDetails.count
+		} 
+		
+		if( thresholdDetails.description) {
+			actionThreshold.description = thresholdDetails.description
+		}
+		
+		if( thresholdDetails.action) {
+			actionThreshold.action = thresholdDetails.action
+		}
+		
+		if( thresholdDetails.args) {
+			actionThreshold.args = thresholdDetails.args
+		}
+		
+		if( thresholdDetails.enabled == 0 || thresholdDetails.enabled == 1) {
+			actionThreshold.enabled = thresholdDetails.enabled
+		}
+		
+		actionThreshold.save( flush:true)
+		
+		return success	
+	}
+	
+	/**
+	 * Delete an action threshold.
+	 * 
+	 * @param id
+	 * @return
+	 */
+	def deleteThreshold( Integer id) {
+		boolean success = true
+		def actionThreshold = ActionThreshold.findById( id)
+		if( actionThreshold)
+			actionThreshold.delete( flush:true)
+		else {
+			success = false
+		}
+		
+		return success
+	}
+	
+	/**
 	 * 
 	 * @param time Time in ISO8601 format
 	 * @return
@@ -297,10 +383,8 @@ class InboundService {
 		DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis()
 		
 		def dateTime = parser.parseDateTime( time)
-		print dateTime
 		def timestamp = new Timestamp( dateTime.getMillis())
 		def historyList = History.findAllByExecutedGreaterThan( timestamp)
-		print historyList
 		
 		def historyResult = []
 		historyList.each { history ->
