@@ -31,7 +31,6 @@
 package edu.berkeley.calnet.cflmonitor.service
 
 import javax.mail.*
-
 import javax.mail.internet.*
 
 import java.util.Date;
@@ -41,13 +40,14 @@ import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.StdSchedulerFactory
+
 import static org.quartz.TriggerBuilder.*
 import static org.quartz.CronScheduleBuilder.*
-
 import edu.berkeley.calnet.cflmonitor.domain.History
 import edu.berkeley.calnet.cflmonitor.domain.ActionThreshold
 import edu.berkeley.calnet.cflmonitor.domain.Configuration
 import edu.berkeley.calnet.cflmonitor.ActionJob
+import grails.transaction.Transactional;
 
 class ActionService {
 	def actions = [:]
@@ -106,11 +106,13 @@ class ActionService {
 		def actionThreshold = ActionThreshold.findByAction( action)
 		
 		def history = new History()
-		history.subject = subject
-		history.action = actionThreshold
-		history.executed = timestamp
-		history.comment = comment
-		
-		history.save( flush:true)
+		History.withTransaction {
+			history.subject = subject
+			history.action = actionThreshold
+			history.executed = timestamp
+			history.comment = comment
+			
+			history.save( flush:true)
+		}
 	}
 }
