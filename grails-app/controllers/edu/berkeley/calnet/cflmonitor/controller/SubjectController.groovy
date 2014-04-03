@@ -41,6 +41,7 @@ class SubjectController {
     def index() { }
     
 	/**
+	 * Obtain all information for a subject
 	 * 
 	 * @param id
 	 * @return
@@ -94,7 +95,7 @@ class SubjectController {
 	 * @param count
 	 * @return subjects that have a failed count (minus resets) greater than count
 	 */
-	def subjectCount(Integer count) {
+	def subjectCount(Long count) {
 		def result = inboundService.subjectCount( count)
 		render( result as JSON)
 	}

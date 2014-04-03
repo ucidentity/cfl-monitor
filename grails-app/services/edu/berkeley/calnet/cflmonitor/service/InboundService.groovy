@@ -145,7 +145,7 @@ class InboundService {
 	 * @param count
 	 * @return
 	 */
-	def subjectCount(Integer count) {
+	def subjectCount(Long count) {
 		def result = [:]
 		
 		def subjects = AuthFailureCounts.createCriteria().list() {
