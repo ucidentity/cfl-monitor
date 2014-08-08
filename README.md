@@ -31,9 +31,48 @@ from authentication_failures f2 where f2.subject = f.subject and f2.recorded  >
 (select coalesce( max(r.reset), '2001-01-01') from authentication_resets r where r.subject = f.subject)) as current_count from authentication_failures f;``
 </pre>
 
-##Running the web-app
+##Alternate Database Setup##
+To use a database other than the default H2, the DataSource.groovy file must be changed.  The DataSource.groovy file is located in ``<src root>/grails-app/conf``.
+
+There are four database configurations in the environment section of the file: development, development-mysql, test, and production.  Each has its own datasource definitions. The development-mysql section is a sample demonstrating how to configure the datasource to use the mysql database.
+
+To change the database config for a production build, edit the datasource section of the production environment. Do the same for the development and test environments as well if a different database is required.
+
+Here is a sample of a postgresql datasource in the production environment:
+
+	production {
+		dataSource {
+			dbCreate = 'update'
+			url = 'jdbc:postgresql:sample'
+			username="ausername"
+			password="thepassword"
+			pooled = true
+			properties {
+				maxActive = -1
+				minEvictableIdleTimeMillis = 1800000
+				timeBetweenEvictionRunsMillis = 1800000
+				numTestsPerEvictionRun = 3
+				testOnBorrow = true
+				testWhileIdle = true
+				testOnReturn = true
+				validationQuery = 'SELECT 1'
+			}
+		}
+	}
+
+
+When running grails commands, grails uses the development environment by default.  See the following section for instructions on running/building with the production environment.
+
+**Note:**
+The authentication_failure_counts table must be created regardless of the the flavor of db being configured.  The sql syntax for its creation may or may not need to be adjusted to accommodate a different database.
+
+##Running the web-app and building a WAR
 The most simple way to run the app is to execute ``grails run-app`` from the project parent directory.  
 To generate a WAR file, execute ``grails dev war`` from the project parent directory.  The resulting WAR will be located in the target directory.
+
+To run the app with the production environment, execute ``grails prod run-app``.
+
+To generate a WAR file using the production datasource and config, execute ``grails prod war`` from the parent directory.
 
 ##Sample Action Script
 
