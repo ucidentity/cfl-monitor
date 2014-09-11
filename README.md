@@ -26,9 +26,7 @@ After the app is running for the first time, you will need to drop the ``authent
 5. Use the SQL statement window on the H2 console to drop the authentication_failure_counts table and then create it as a view
 <pre>
 ``drop table authentication_failure_counts;``
-``create or replace view authentication_failure_counts as select distinct f.subject, (select count(*) as current_count 
-from authentication_failures f2 where f2.subject = f.subject and f2.recorded  > 
-(select coalesce( max(r.reset), '2001-01-01') from authentication_resets r where r.subject = f.subject)) as current_count from authentication_failures f;``
+``create or replace view authentication_failure_counts as select f.subject, count(*) as current_count from authentication_failures f where f.recorded > (select coalesce(max(r.reset), '2001-01-01') from authentication_resets r where r.subject = f.subject) group by f.subject;``
 </pre>
 
 ##Alternate Database Setup##
