@@ -9,7 +9,7 @@ import grails.plugin.mail.*
 name = "Email Action"
 action = "emailAction"
 
-performAction = { config, subject, args ->
+performAction = { mailService, config, subj, args ->
 	try {
 		JSONObject jsonArgs = JSON.parse( args)
 

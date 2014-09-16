@@ -41,6 +41,8 @@ Here is a sample of a postgresql datasource in the production environment:
 	production {
 		dataSource {
 			dbCreate = 'update'
+			driverClassName = "org.postgresql.Driver"
+ 			dialect = org.hibernate.dialect.PostgreSQLDialect
 			url = 'jdbc:postgresql:sample'
 			username="ausername"
 			password="thepassword"
@@ -114,7 +116,7 @@ import org.codehaus.groovy.grails.web.json.*
 import edu.berkeley.calnet.cflmonitor.service.ActionService
 
 action = "actionKey"
-performAction = { config, subject, args ->
+performAction = { mailService, config, subj, args ->
 	ActionService.createHistoryRecord( subject, config.action, "Action executed")
 	JSONObject jsonArgs = JSON.parse( args)
 }
@@ -126,9 +128,29 @@ The `performAction` property is a Groovy closure that the application will execu
 
 `config` : a reference to the script itself so that the script can access any additional properties that may be present in the script.
 
-`subject`: a String reference to the subject.
+`subject`: a String array reference to the subject.  The first element is the subject name, the second element is the current failure count of the subject, and the third element is the last reset time for the subject.
 
 `args`: a String reference to the value of the args column for the action in the `action_thresholds` table.
+
+##Email Configuration for Action Scripts
+Application-wide email settings are located in the Config.groovy source file.
+
+	grails
+	 {
+   		mail 
+		{
+		   	host = "smtp.gmail.com"
+	  		port = 465
+	  		username = "a-user-name"
+	  		password = "a-passord"
+	  		props = ["mail.smtp.auth":"true",
+			   "mail.smtp.socketFactory.port":"465",
+			   "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+			   "mail.smtp.socketFactory.fallback":"false"]
+		}
+ 	}
+ 	
+The application uses the Asynchronous Mail plugin.  More information can be found regarding configuration at [http://grails.org/plugin/asynchronous-mail](http://grails.org/plugin/asynchronous-mail)
 
 ##Default Polling Interval
 
