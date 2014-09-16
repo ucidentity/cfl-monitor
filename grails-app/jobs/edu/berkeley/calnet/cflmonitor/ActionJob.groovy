@@ -37,7 +37,7 @@ class ActionJob {
 	
 	def jobService
 	
-	// trigger is empty because it will be dynamically scheduled
+	// trigger is empty because it will be scheduled at runtime
     static triggers = {
     }
 

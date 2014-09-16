@@ -49,6 +49,7 @@ class ActionThreshold {
     static constraints = {
         action(size:1..80)
 		description(size:1..80)
+		args(size:1..2048) 
     }
 	
 	def asReportMap() {

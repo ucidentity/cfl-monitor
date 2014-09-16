@@ -33,10 +33,13 @@ package edu.berkeley.calnet.cflmonitor.service
 import grails.converters.JSON
 import grails.transaction.Transactional
 
+import java.beans.PropertyChangeEvent;
 import java.sql.Timestamp
+
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+
 import edu.berkeley.calnet.cflmonitor.domain.*
 
 @Transactional
@@ -179,6 +182,8 @@ class InboundService {
 		def subjects = AuthFailureCounts.createCriteria().list() {
 			projections {
 				property( 'subject')
+				property( 'currentCount')
+				property( 'currentCount') // a placeholder to place the last reset time
 			}
 			
 			gt('currentCount', count)
@@ -190,7 +195,7 @@ class InboundService {
 			returnSubjectList = subjects.findAll { subject ->
 				// get the history
 				def historyList = History.createCriteria().list {
-					eq('subject', subject)
+					eq('subject', subject[0])
 					order('executed', 'desc')
 				}
 				
@@ -200,6 +205,7 @@ class InboundService {
 					// look for this action in the list that appears before a reset event
 					if( history.action == null) {
 						// reset actions have null action
+						subject[2] = history.executed.toString()  // put the last reset time here for possible reporting in notification email
 						foundReset = true
 					}
 					else if( history.action.id == actionId) {
@@ -207,6 +213,7 @@ class InboundService {
 					}
 					
 					if( foundReset || !processAction) {
+						subject[2] = history.executed.toString() // put the last reset time here for possible reporting in notification email
 						return true
 					}
 				}

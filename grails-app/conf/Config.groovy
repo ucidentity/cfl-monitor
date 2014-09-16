@@ -132,8 +132,6 @@ if (!catalinaBase) catalinaBase = '/Users/mglazier/work'
 def logDirectory = "${catalinaBase}/logs/cfl"
 
 log4j = {
-    // Example of changing the log pattern for the default console appender:
-    //
     appenders {
         console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
 		appender new DailyRollingFileAppender(
@@ -167,6 +165,7 @@ grails.plugins.springsecurity.securityConfigType = SecurityConfigType.InterceptU
 grails.plugins.springsecurity.rejectIfNoRule = true
 
 grails.plugins.springsecurity.interceptUrlMap = [
+	// now user can do everything
 	'/v*/**': ['ROLE_USER'],
 	'/*.html':							[
 		'IS_AUTHENTICATED_ANONYMOUSLY'
@@ -217,6 +216,19 @@ grails.plugins.springsecurity.basic.realmName = "CFL Server"
 
 grails.converters.pretty.print = true
 grails.json.date = "javascript"
+
+grails {
+	mail {
+	  host = "smtp.gmail.com"
+	  port = 465
+	  username = ""
+	  password = ""
+	  props = ["mail.smtp.auth":"true",
+			   "mail.smtp.socketFactory.port":"465",
+			   "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+			   "mail.smtp.socketFactory.fallback":"false"]
+	}
+ }
 
 // this is the default action polling time
 cfl {

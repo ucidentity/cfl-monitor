@@ -71,9 +71,10 @@ grails.project.dependency.resolution = {
         
         compile ":spring-security-core:1.2.7.3"
         compile ":spring-security-ui:0.2"
-        compile ":mail:1.0.1"
+        compile ":mail:1.0.7"
         compile ":famfamfam:1.0.1"
         compile ":ajax-uploader:1.1"
+		compile ":asynchronous-mail:1.1"
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"
         //runtime ":cached-resources:1.1"

@@ -1,19 +1,17 @@
 package edu.berkeley.calnet.cflmonitor.service
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Import;
-
-import grails.transaction.Transactional
-import groovyx.gpars.dataflow.operator.component.GracefulShutdownListener;
-import edu.berkeley.calnet.cflmonitor.service.ActionService
-import edu.berkeley.calnet.cflmonitor.service.InboundService
-import edu.berkeley.calnet.cflmonitor.domain.ActionThreshold
-import groovyx.gpars.AsyncFun
 import static groovyx.gpars.GParsPool.withPool
+import edu.berkeley.calnet.cflmonitor.domain.ActionThreshold
+import grails.plugin.asyncmail.AsynchronousMailService
+import grails.transaction.Transactional
 
 @Transactional
 class JobService {
 	def actionService
 	def inboundService
+	def mailService
+	
+	AsynchronousMailService asyncMailService
 	
 	/**
 	 * 
@@ -37,7 +35,7 @@ class JobService {
 							log.info "Perform action: " + action.action + " subject: " + subject
 							
 							Closure performAction = service.&performAction.asyncFun()
-							performAction( service, subject, action.args)
+							performAction( mailService, service, subject, action.args)
 						}
 					}
 				}
