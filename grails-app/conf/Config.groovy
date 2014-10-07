@@ -32,10 +32,10 @@
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
+grails.config.locations = [ "classpath:${appName}-config.properties",
+                             "classpath:${appName}-config.groovy",
+                             "file:${userHome}/.grails/${appName}-config.properties",
+                             "file:${userHome}/.grails/${appName}-config.groovy"]
 
 // if (System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
@@ -93,7 +93,7 @@ grails {
         }
     }
 }
- 
+
 grails.converters.encoding = "UTF-8"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
@@ -116,38 +116,59 @@ grails.hibernate.cache.queries = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+        grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
     }
 	development-mysql {
 		grails.logging.jul.usebridge = true
+        grails.mail.port = com.icegreen.greenmail.util.ServerSetupTest.SMTP.port
 	}
     production {
         grails.logging.jul.usebridge = false
         // TODO: grails.serverURL = "http://www.changeme.com"
+        greenmail.disabled=true
+        grails {
+            mail {
+                host = "smtp.gmail.com"
+                port = 465
+                username = ""
+                password = ""
+                props = ["mail.smtp.auth":"true",
+                         "mail.smtp.socketFactory.port":"465",
+                         "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+                         "mail.smtp.socketFactory.fallback":"false"]
+            }
+        }
+
     }
 }
 
 // log4j configuration
 def catalinaBase = System.properties.getProperty('catalina.base')
-if (!catalinaBase) catalinaBase = '/Users/mglazier/work'
-def logDirectory = "${catalinaBase}/logs/cfl"
+if (!catalinaBase) catalinaBase = '.'
+def logDirectory = new File("${catalinaBase}/logs/cfl")
+logDirectory.mkdirs()
 
 log4j = {
     appenders {
         console name:'stdout', layout:pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
 		appender new DailyRollingFileAppender(
 			name: "rollingFileCfl",
-			file: "${logDirectory}/cfl.log",
+			file: "${logDirectory.absolutePath}/cfl.log",
 			datePattern: "'.'yyyy-MM-dd",
 			layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
 		)
     }
-    
+
 	root {
 		info 'stdout', 'rollingFileCfl'
 		additivity = false
 	}
-	
-	debug 'org.quartz'
+
+    debug 'org.quartz',
+            'grails.app.domain.edu.berkeley',
+            'grails.app.controllers.edu.berkeley',
+            'grails.app.services.edu.berkeley',
+            'grails.app.jobs.edu.berkeley'
 }
 
 grails.plugins.springsecurity.userLookup.userDomainClassName = 'edu.berkeley.calnet.cflmonitor.domain.SecUser'
@@ -165,32 +186,17 @@ grails.plugins.springsecurity.securityConfigType = SecurityConfigType.InterceptU
 grails.plugins.springsecurity.rejectIfNoRule = true
 
 grails.plugins.springsecurity.interceptUrlMap = [
-	// now user can do everything
-	'/v*/**': ['ROLE_USER'],
-	'/*.html':							[
-		'IS_AUTHENTICATED_ANONYMOUSLY'
-	],
-	'/*.xml':							[
-		'IS_AUTHENTICATED_ANONYMOUSLY'
-	],
-	'/*.gsp':							[
-		'IS_AUTHENTICATED_ANONYMOUSLY'
-	],
-	'/css/**':							[
-		'IS_AUTHENTICATED_ANONYMOUSLY'
-	],
-	'/js/**':							[
-		'IS_AUTHENTICATED_ANONYMOUSLY'
-	],
-	'/images/**':							[
-		'IS_AUTHENTICATED_ANONYMOUSLY'
-	],
-	'/html/**':							[
-		'IS_AUTHENTICATED_ANONYMOUSLY'
-	],
-	'/dbconsole/**':							[
-		'ROLE_ADMIN'
-	]
+        // now user can do everything
+        '/v*/**'       : ['ROLE_USER'],
+        '/*.html'      : ['IS_AUTHENTICATED_ANONYMOUSLY'],
+        '/*.xml'       : ['IS_AUTHENTICATED_ANONYMOUSLY'],
+        '/*.gsp'       : ['IS_AUTHENTICATED_ANONYMOUSLY'],
+        '/css/**'      : ['IS_AUTHENTICATED_ANONYMOUSLY'],
+        '/js/**'       : ['IS_AUTHENTICATED_ANONYMOUSLY'],
+        '/images/**'   : ['IS_AUTHENTICATED_ANONYMOUSLY'],
+        '/html/**'     : ['IS_AUTHENTICATED_ANONYMOUSLY'],
+        '/dbconsole/**': ['ROLE_ADMIN'],
+        '/greenmail/**': ['IS_AUTHENTICATED_ANONYMOUSLY']
 ]
 
 grails.plugins.springsecurity.secureChannel.definition = [
@@ -217,18 +223,6 @@ grails.plugins.springsecurity.basic.realmName = "CFL Server"
 grails.converters.pretty.print = true
 grails.json.date = "javascript"
 
-grails {
-	mail {
-	  host = "smtp.gmail.com"
-	  port = 465
-	  username = ""
-	  password = ""
-	  props = ["mail.smtp.auth":"true",
-			   "mail.smtp.socketFactory.port":"465",
-			   "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-			   "mail.smtp.socketFactory.fallback":"false"]
-	}
- }
 
 // this is the default action polling time
 cfl {

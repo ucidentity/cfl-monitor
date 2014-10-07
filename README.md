@@ -110,6 +110,8 @@ Several rows will need to be added depending on the threshold count for the conf
 
 The threshold action scripts are essentially Groovy configuration files that are read by the application at runtime.  There are two important pieces of configuration that the script needs to have in order to be executed.
 
+
+
 <pre>
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.*
@@ -132,11 +134,14 @@ The `performAction` property is a Groovy closure that the application will execu
 
 `args`: a String reference to the value of the args column for the action in the `action_thresholds` table.
 
+###Example of action
+Can be found in `src/actions`
+
 ##Email Configuration for Action Scripts
 Application-wide email settings are located in the Config.groovy source file.
 
-	grails
-	 {
+<pre>
+	grails {
    		mail 
 		{
 		   	host = "smtp.gmail.com"
@@ -148,9 +153,12 @@ Application-wide email settings are located in the Config.groovy source file.
 			   "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
 			   "mail.smtp.socketFactory.fallback":"false"]
 		}
- 	}
- 	
+ 	 }
+</pre> 	
 The application uses the Asynchronous Mail plugin.  More information can be found regarding configuration at [http://grails.org/plugin/asynchronous-mail](http://grails.org/plugin/asynchronous-mail)
+
+In development mode, the plugin Greenmail makes sure, that no email is sent out of the system. Instead these mails can be read on the following url: http://localhost:8080/cfl/greenmail. The required login is admin. More
+information on greenmail can be found here: [http://grails.org/plugin/greenmail](http://grails.org/plugin/greeenmail).
 
 ##Default Polling Interval
 
@@ -168,3 +176,5 @@ The best way to change the polling interval is to use the application's REST int
 
 After sending this command, the polling interval will be stored in the database and the default from the Config.groovy file will no longer be used.
 
+##Logging
+The current log-level for the application is debug. This is set in Config.groovy 
