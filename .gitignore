@@ -44,7 +44,9 @@
 
 # other
 *.iws
-
+*.ipr
+*.iml 
+*.ids
 /plugin.xml
 /*.log
 /*DB.*
